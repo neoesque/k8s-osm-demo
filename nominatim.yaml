@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nominatim
+  labels:
+    app: nominatim-tw
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: nominatim-tw
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nominatim-tw
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nominatim-tw
+    spec:
+      containers:
+      - name: nominatim
+        image: hinet/nominatim-tw
+        ports:
+        - containerPort: 8080

@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: web
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: osmtw/osm-tiles:latest
+        env:
+        - name: PG_ENV_POSTGRES_USER
+          value: "postgres"
+        - name: PG_ENV_POSTGRES_DB
+          value: "postgres"
+        - name: PG_ENV_POSTGRES_PASSWORD
+          value: "pa55w0rd"
+        - name: PG_PORT_5432_TCP_ADDR
+          value: "postgis"
+        - name: PG_PORT_5432_TCP_PORT
+          value: "5432"
+        volumeMounts:
+        - name: renderd
+          mountPath: "/usr/local/etc/renderd.conf"
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "1"
+          limits:
+            cpu: "2"
+      volumes:
+      - name: renderd
+        hostPath:
+          path: /home/rancher/osm-tiles-docker/renderd.conf
